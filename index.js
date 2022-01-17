@@ -16,8 +16,11 @@ require('uWebSockets.js')
       /* You can do app.publish('sensors/home/temperature', '22C') kind of pub/sub as well */
 
       /* Here we echo the message back, using compression if available */
-      let ok = ws.send(`server response ${new TextDecoder('utf-8').decode(message)}`, isBinary, true)
-      console.log(message.toString())
+      let now = Date.now()
+      let serverTime = new TextDecoder('utf-8').decode(message)
+      let trip = now - serverTime
+      // let ok = ws.send(`server response ${new TextDecoder('utf-8').decode(message)}`, isBinary, true)
+      console.log(`server:${serverTime} - local: ${now} = ${trip}`)
     },
     close: (ws, code, message) => {
       console.log(`WebSocket closed: ${message}`)
