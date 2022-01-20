@@ -8,7 +8,7 @@ require('uWebSockets.js')
     /* There are many common helper features */
     idleTimeout: 32,
     maxBackpressure: 1024,
-    maxPayloadLength: 512,
+    maxPayloadLength: 2048,
     /* For brevity we skip the other events (upgrade, open, ping, pong, close) */
     open: (ws) => {
       /* Let this client listen to all sensor topics */
