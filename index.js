@@ -18,7 +18,7 @@ require('uWebSockets.js')
     message: (ws, message, isBinary) => {
       let string = new TextDecoder('utf-8').decode(message)
 
-      if (string === 'connector' && connector === null) {
+      if (string === 'connector') {
         connector = ws
       } else if (string === 'user') {
         user = ws
