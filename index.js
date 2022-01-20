@@ -28,7 +28,7 @@ require('uWebSockets.js')
           if (s[1] === 'millis') {
             let now = Date.now()
             let connectorTime = s[2]
-            let trip = now - serverTime
+            let trip = now - connectorTime
             console.log(`connector:${connectorTime} - local: ${now} = ${trip}`)
           } else {
             user.send(s.shift().join(' '))
