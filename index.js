@@ -24,14 +24,16 @@ require('uWebSockets.js')
         user = ws
       } else {
         let s = string.split(' ')
-        if (s[0] === 'connector' && user != null && connector != null) {
+        if (s[0] === 'connector') {
           if (s[1] === 'millis') {
             let now = Date.now()
             let connectorTime = s[2]
             let trip = now - connectorTime
             console.log(`connector:${connectorTime} - local: ${now} = ${trip}`)
           } else {
-            user.send(s.slice(1).join(' '))
+            if (user != null) {
+              user.send(s.slice(1).join(' '))
+            }
           }
         } else if (s[0] === 'user' && user != null && connector != null) {
           let t1 = s[1] === 'BUY' || s[1] === 'SELL'
