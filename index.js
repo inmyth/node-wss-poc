@@ -35,8 +35,8 @@ require('uWebSockets.js')
           }
         } else if (s[0] === 'user' && user != null && connector != null) {
           let t1 = s[1] === 'BUY' || s[1] === 'SELL'
-          let t2 = typeof s[2] === 'number'
-          let t3 = typeof s[3] === 'number'
+          let t2 = !isNaN(Number(s[2]))
+          let t3 = !isNaN(Number(s[3]))
           if (t1 && t2 && t3) {
             connector.send(s.shift().join(' '))
             user.send(`Acknowledge ${s[1]}`)
