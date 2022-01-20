@@ -1,9 +1,12 @@
 /* Non-SSL is simply App() */
+
+var connector = null
+var user = null
 require('uWebSockets.js')
   .App()
   .ws('/*', {
     /* There are many common helper features */
-    idleTimeout: 30,
+    idleTimeout: 32,
     maxBackpressure: 1024,
     maxPayloadLength: 512,
     /* For brevity we skip the other events (upgrade, open, ping, pong, close) */
@@ -13,14 +16,39 @@ require('uWebSockets.js')
       // ws.subscribe('home/sensors/#')
     },
     message: (ws, message, isBinary) => {
-      /* You can do app.publish('sensors/home/temperature', '22C') kind of pub/sub as well */
+      let string = new TextDecoder('utf-8').decode(message)
 
-      /* Here we echo the message back, using compression if available */
-      let now = Date.now()
-      let serverTime = new TextDecoder('utf-8').decode(message)
-      let trip = now - serverTime
-      // let ok = ws.send(`server response ${new TextDecoder('utf-8').decode(message)}`, isBinary, true)
-      console.log(`server:${serverTime} - local: ${now} = ${trip}`)
+      if (string === 'connector' && connector === null) {
+        connector = ws
+      } else if (string === 'user') {
+        user = ws
+      } else {
+        let s = string.split(' ')
+        if (s[0] === 'connector' && user != null && connector != null) {
+          if (s[1] === 'millis') {
+            let now = Date.now()
+            let connectorTime = s[2]
+            let trip = now - serverTime
+            console.log(`connector:${connectorTime} - local: ${now} = ${trip}`)
+          } else {
+            user.send(s.shift().join(' '))
+          }
+        } else if (s[0] === 'user' && user != null && connector != null) {
+          let t1 = s[1] === 'BUY' || s[1] === 'SELL'
+          let t2 = typeof s[2] === 'number'
+          let t3 = typeof s[3] === 'number'
+          if (t1 && t2 && t3) {
+            connector.send(s.shift().join(' '))
+            user.send(`Acknowledge ${s[1]}`)
+          } else {
+            user.send('Bad buy/sell command')
+          }
+        } else {
+          if (user != null) {
+            user.send('Bad command')
+          }
+        }
+      }
     },
     close: (ws, code, message) => {
       console.log(`WebSocket closed: ${message}`)
